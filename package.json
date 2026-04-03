@@ -1,0 +1,33 @@
+{
+  "name": "karboai",
+  "version": "1.0.0",
+  "description": "A powerful lib for https://karboai.com",
+  "keywords": [
+    "karbo",
+    "karboai",
+    "ai",
+    "requests",
+    "social",
+    "bots"
+  ],
+  "private": false,
+  "main": "dist/index.js",
+  "files": [
+    "README.MD",
+    "dist"
+  ],
+  "homepage": "https://github.com/thatcelt/KarboAI#readme",
+  "bugs": {
+    "url": "https://github.com/thatcelt/KarboAI/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thatcelt/KarboAI.git"
+  },
+  "license": "MIT",
+  "author": "celt_is_god",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
