@@ -33,3 +33,9 @@ export const ERRORS: Record<number, ErrorData> = {
     message: 'Rate limit exceeded',
   },
 };
+
+export const SOCKET_TOPICS = {
+  // TODO: add more topics
+  0: 'message',
+  1: 'join',
+};

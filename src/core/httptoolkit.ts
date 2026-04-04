@@ -47,7 +47,7 @@ export class HttpToolKit {
 
   public post = async <T>(config: PostRequestConfig): Promise<T> => {
     const response = await fetch(`${KARBO_API}${config.path}`, {
-      method: 'GET',
+      method: 'POST',
       body: config.body,
       headers: this.headers,
     });

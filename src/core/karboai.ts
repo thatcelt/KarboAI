@@ -18,16 +18,25 @@ import { clean } from '../utils/utils';
 import { HttpToolKit } from './httptoolkit';
 import { Message, MessageSchema } from '../schemas/karboai/message';
 import { User, UserSchema } from '../schemas/karboai/users';
+import { Dispatcher } from './hub/dispatcher';
+import { ConnectCallback } from '../schemas/sockets';
+import { Router } from './hub/router';
 
 export class KarboAI {
   private readonly config: KarboConfig;
   private readonly httptoolkit: HttpToolKit;
+  private readonly dispatcher: Dispatcher;
 
   constructor(config: KarboConfig) {
     this.config = config;
-    this.httptoolkit = new HttpToolKit(config.token);
+    this.httptoolkit = new HttpToolKit(this.config.token);
+    this.dispatcher = new Dispatcher(this);
 
-    initLogger(!!config.enableLogging);
+    initLogger(!!this.config.enableLogging);
+  }
+
+  get id() {
+    return this.config.id;
   }
 
   private sendMessage = async (
@@ -129,4 +138,10 @@ export class KarboAI {
         schema: OkResponseSchema,
       })
     ).ok;
+
+  public attach = (callback: ConnectCallback = async () => {}): void =>
+    this.dispatcher.attach(this.config.token, callback);
+
+  public bind = (...routers: Router[]): void =>
+    this.dispatcher.bind(...routers);
 }
