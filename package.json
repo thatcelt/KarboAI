@@ -1,6 +1,6 @@
 {
   "name": "karboai",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A powerful lib for https://karboai.com",
   "keywords": [
     "karbo",
@@ -28,6 +28,10 @@
   "author": "celt_is_god",
   "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsc && node dist/tests/main.js"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.3",
+    "zod": "^4.3.6"
   }
 }
