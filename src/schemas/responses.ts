@@ -1,4 +1,5 @@
 import z from 'zod';
+
 import { BotStatusEnum } from './enums';
 
 export const MeResponseSchema = z
@@ -15,4 +16,17 @@ export const MeResponseSchema = z
     };
   });
 
+export const MessageResponseSchema = z
+  .object({
+    message_id: z.string(),
+    created_time: z.number(),
+  })
+  .transform((data) => {
+    return {
+      messageId: data.message_id,
+      createdAt: data.created_time,
+    };
+  });
+
 export type MeResponse = z.Infer<typeof MeResponseSchema>;
+export type MessageResponse = z.Infer<typeof MessageResponseSchema>;

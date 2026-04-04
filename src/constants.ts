@@ -1,4 +1,5 @@
 import { UndiciHeaders } from 'undici/types/dispatcher';
+
 import { ErrorData } from './schemas/error';
 
 export const KARBO_API = 'https://api.karboai.com';

@@ -16,6 +16,14 @@ export const KarboConfigSchema = z.object({
   enableLogging: z.boolean().optional(),
 });
 
+export const SendMessageConfigSchema = z.object({
+  chatId: z.string(),
+  content: z.string().optional(),
+  replyMessageId: z.string().optional(),
+  images: z.array(z.string()).optional(),
+});
+
 export type GetRequestConfig = z.Infer<typeof GetRequestConfigSchema>;
 export type PostRequestConfig = z.Infer<typeof PostRequestConfigSchema>;
 export type KarboConfig = z.Infer<typeof KarboConfigSchema>;
+export type SendMessageConfig = z.Infer<typeof SendMessageConfigSchema>;
