@@ -10,6 +10,12 @@ export const PostRequestConfigSchema = z.object({
   body: z.string(),
 });
 
+export const MultipartRequestConfigSchema = z.object({
+  ...GetRequestConfigSchema.shape,
+  buffer: z.instanceof(Buffer),
+  fileName: z.string(),
+});
+
 export const KarboConfigSchema = z.object({
   token: z.string(),
   id: z.string(),
@@ -25,5 +31,8 @@ export const SendMessageConfigSchema = z.object({
 
 export type GetRequestConfig = z.Infer<typeof GetRequestConfigSchema>;
 export type PostRequestConfig = z.Infer<typeof PostRequestConfigSchema>;
+export type MultipartRequestConfig = z.Infer<
+  typeof MultipartRequestConfigSchema
+>;
 export type KarboConfig = z.Infer<typeof KarboConfigSchema>;
 export type SendMessageConfig = z.Infer<typeof SendMessageConfigSchema>;

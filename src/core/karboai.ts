@@ -1,9 +1,13 @@
+import { readFile } from 'fs/promises';
+
 import { KarboConfig, SendMessageConfig } from '../schemas/configs';
 import {
   MeResponse,
   MeResponseSchema,
   MessageResponse,
   MessageResponseSchema,
+  UploadResponse,
+  UploadResponseSchema,
 } from '../schemas/responses';
 import initLogger from '../utils/logger';
 import { clean } from '../utils/utils';
@@ -63,4 +67,17 @@ export class KarboAI {
       images,
       replyMessageId,
     });
+
+  public upload = async (path: string): Promise<string> => {
+    const file = await readFile(path);
+
+    return (
+      await this.httptoolkit.multipart<UploadResponse>({
+        path: '/bot/upload/image',
+        buffer: file,
+        fileName: path.split('/').pop()!,
+        schema: UploadResponseSchema,
+      })
+    ).url;
+  };
 }

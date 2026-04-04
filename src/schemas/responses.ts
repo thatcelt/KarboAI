@@ -28,5 +28,10 @@ export const MessageResponseSchema = z
     };
   });
 
+export const UploadResponseSchema = z.object({
+  url: z.string(),
+});
+
 export type MeResponse = z.Infer<typeof MeResponseSchema>;
 export type MessageResponse = z.Infer<typeof MessageResponseSchema>;
+export type UploadResponse = z.Infer<typeof UploadResponseSchema>;
