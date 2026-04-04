@@ -1,6 +1,7 @@
 import z from 'zod';
 
 import { BotStatusEnum } from './enums';
+import { UserSchema } from './karboai/users';
 
 export const MeResponseSchema = z
   .object({
@@ -32,6 +33,16 @@ export const UploadResponseSchema = z.object({
   url: z.string(),
 });
 
+export const MembersResponseSchema = z.object({
+  items: z.array(UserSchema),
+});
+
+export const OkResponseSchema = z.object({
+  ok: z.boolean(),
+});
+
 export type MeResponse = z.Infer<typeof MeResponseSchema>;
 export type MessageResponse = z.Infer<typeof MessageResponseSchema>;
 export type UploadResponse = z.Infer<typeof UploadResponseSchema>;
+export type MembersResponse = z.Infer<typeof MembersResponseSchema>;
+export type OkResponse = z.Infer<typeof OkResponseSchema>;
