@@ -83,14 +83,15 @@ export class KarboAI {
       replyMessageId,
     });
 
-  public upload = async (path: string): Promise<string> => {
-    const file = await readFile(path);
-
+  public upload = async (
+    buffer: Buffer,
+    fileName: string = 'file.png',
+  ): Promise<string> => {
     return (
       await this.httptoolkit.multipart<UploadResponse>({
         path: '/bot/upload/image',
-        buffer: file,
-        fileName: path.split('/').pop()!,
+        buffer,
+        fileName,
         schema: UploadResponseSchema,
       })
     ).url;
