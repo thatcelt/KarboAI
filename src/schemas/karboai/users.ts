@@ -35,7 +35,7 @@ export const AuthorSchema = z
     avatar_frame: z.object().nullable().optional(),
     role: z.number().optional(),
     app_role: z.number().optional(),
-    panel_color: z.string().optional(),
+    panel_color: z.string().nullable().optional(),
     level: z.number().optional(),
     nickname_color: z.string().nullable().optional(),
     nickname_emoji: z.string().nullable().optional(),
