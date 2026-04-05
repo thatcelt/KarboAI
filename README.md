@@ -32,6 +32,14 @@ A powerful library for creating bots in the [KarboAI](https://karboai.com) appli
     - [on()](#on)
     - [command()](#command)
 - [Schemas](#schemas)
+- [Utilities](#utilities)
+  - [bold()](#bold)
+  - [italic()](#italic)
+  - [centralize()](#centralize)
+  - [code()](#code)
+  - [strikethrough()](#strikethrough)
+  - [underline()](#underline)
+  - [hyperlink()](#hyperlink)
 - [Logging](#logging)
 
 ## Installation
@@ -391,6 +399,120 @@ The library exports several TypeScript types and Zod schemas:
 
 ```typescript
 import { KarboConfig, Message, KarboContext, User } from 'karboai';
+```
+
+## Utilities
+
+Helper functions for formatting text in messages. All utilities are exported from the main package.
+
+```typescript
+import { bold, italic, centralize, code, strikethrough, underline, hyperlink } from 'karboai';
+```
+
+### `bold(text)`
+
+Wraps text in bold formatting.
+
+**Parameters:**
+- `text` — Text to format
+
+**Returns:** `string` — Formatted text with `**` markers
+
+**Example:**
+```typescript
+await karbo.text('chat-123', bold('This is bold text'));
+// Sends: **This is bold text**
+```
+
+### `italic(text)`
+
+Wraps text in italic formatting.
+
+**Parameters:**
+- `text` — Text to format
+
+**Returns:** `string` — Formatted text with `__` markers
+
+**Example:**
+```typescript
+await karbo.text('chat-123', italic('This is italic text'));
+// Sends: __This is italic text__
+```
+
+### `centralize(text)`
+
+Centers text in the message.
+
+**Parameters:**
+- `text` — Text to center
+
+**Returns:** `string` — Formatted text with `[C]` prefix
+
+**Example:**
+```typescript
+await karbo.text('chat-123', centralize('Centered text'));
+// Sends: [C]Centered text
+```
+
+### `code(text)`
+
+Wraps text in inline code formatting.
+
+**Parameters:**
+- `text` — Text to format
+
+**Returns:** `string` — Formatted text with backtick markers
+
+**Example:**
+```typescript
+await karbo.text('chat-123', code('const x = 42'));
+// Sends: `const x = 42`
+```
+
+### `strikethrough(text)`
+
+Wraps text in strikethrough formatting.
+
+**Parameters:**
+- `text` — Text to format
+
+**Returns:** `string` — Formatted text with `~~` markers
+
+**Example:**
+```typescript
+await karbo.text('chat-123', strikethrough('This is deleted'));
+// Sends: ~~This is deleted~~
+```
+
+### `underline(text)`
+
+Wraps text in underline formatting.
+
+**Parameters:**
+- `text` — Text to format
+
+**Returns:** `string` — Formatted text with `++` markers
+
+**Example:**
+```typescript
+await karbo.text('chat-123', underline('Underlined text'));
+// Sends: ++Underlined text++
+```
+
+### `hyperlink(text, url)`
+
+Creates a hyperlink with display text.
+
+**Parameters:**
+- `text` — Display text for the link
+- `url` — URL for the hyperlink
+
+**Returns:** `string` — Formatted hyperlink
+
+**Example:**
+```typescript
+await karbo.text('chat-123', hyperlink('Visit KarboAI', 'https://karboai.com'));
+// Sends: [Visit KarboAI](https://karboai.com)
 ```
 
 ## Logging
