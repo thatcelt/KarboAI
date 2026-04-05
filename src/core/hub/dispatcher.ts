@@ -27,17 +27,18 @@ export class Dispatcher {
 
       const event = SOCKET_TOPICS[message.type as keyof typeof SOCKET_TOPICS];
 
+      LOGGER.info({
+        event,
+        content: message.content,
+        chatId: message.chatId,
+        userId: message.author.userId,
+        type: message.type,
+      });
+
       this.listeners.get(event)?.forEach(async (listener) => {
         for (const middleware of listener.middlewares) {
           if (!(await middleware({ karbo: this.karbo, message }))) return;
         }
-
-        LOGGER.info({
-          event,
-          content: message.content,
-          chatId: message.chatId,
-          userId: message.author.userId,
-        });
 
         listener.callback({ karbo: this.karbo, message });
       });

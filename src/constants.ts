@@ -38,4 +38,8 @@ export const SOCKET_TOPICS = {
   // TODO: add more topics
   0: 'message',
   1: 'join',
+  2: 'leave',
+  7: 'voiceStart',
+  8: 'voiceEnd',
+  12: 'sticker',
 };

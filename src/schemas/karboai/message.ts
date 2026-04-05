@@ -14,7 +14,7 @@ export const MessageSchema = z
     sticker: z.string().nullable().optional(),
     images: z.array(z.string()),
     audio_duration_ms: z.number().nullable().optional(),
-    waveform: z.string().nullable().optional(),
+    waveform: z.array(z.any()).nullable().optional(),
     video_note: z.string().nullable().optional(),
     video_note_duration_ms: z.number().nullable().optional(),
     transparent: z.boolean().optional(),

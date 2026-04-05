@@ -345,7 +345,7 @@ router.pre(async ({ message }) => {
 Registers an event listener.
 
 **Parameters:**
-- `event` — Event type (`'message'` | `'join'`)
+- `event` — Event type (`'message'` | `'join'` | `'leave'` | `'voiceStart'` | `'voiceEnd'` | `'sticker'`)
 - `callback` — Async function receiving `KarboContext`
 
 **Example:**

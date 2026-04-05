@@ -345,7 +345,7 @@ router.pre(async ({ message }) => {
 Регистрирует обработчик события.
 
 **Параметры:**
-- `event` — Тип события (`'message'` | `'join'`)
+- `event` — Тип события (`'message'` | `'join'` | `'leave'` | `'voiceStart'` | `'voiceEnd'` | `'sticker'`)
 - `callback` — Асинхронная функция, принимающая `KarboContext`
 
 **Пример:**
