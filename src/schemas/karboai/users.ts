@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FrameSchema } from './frame';
 
 const BasicUserSchema = z.object({
   user_id: z.string(),
@@ -32,7 +33,7 @@ export const AuthorSchema = z
     user_id: z.string(),
     nickname: z.string(),
     avatar_url: z.string(),
-    avatar_frame: z.object().nullable().optional(),
+    avatar_frame: FrameSchema.nullable().optional(),
     role: z.number().optional(),
     app_role: z.number().optional(),
     panel_color: z.string().nullable().optional(),

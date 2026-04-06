@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { AuthorSchema } from './users';
+import { ReactionSchema } from './reaction';
 
 export const MessageSchema = z
   .object({
@@ -20,7 +21,7 @@ export const MessageSchema = z
     transparent: z.boolean().optional(),
     bubble_id: z.string().nullable().optional(),
     bubble_version: z.number().nullable().optional(),
-    reactions: z.array(z.any()).optional(),
+    reactions: z.array(ReactionSchema).optional(),
     author: AuthorSchema,
   })
   .transform((data) => {
