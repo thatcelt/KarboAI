@@ -65,11 +65,12 @@ export class Dispatcher {
       auth: { bot_token: token },
     });
 
+    this.processListeners();
+
     this.socket.on('connect', async () => {
       LOGGER.info('Connected to KarboAI socket');
 
       await callback();
-      this.processListeners();
     });
   };
 }
