@@ -11,7 +11,8 @@ import { generateRouterName } from '../../utils/utils';
 const commandMiddleware =
   (content: string) =>
   async (context: KarboContext): Promise<boolean> => {
-    if (!context.message.content.startsWith(content)) return false;
+    if (!context.message.content.toLowerCase().startsWith(content))
+      return false;
     return true;
   };
 
