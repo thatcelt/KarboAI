@@ -1,52 +1,58 @@
-# KarboAI
+# KarboAI SDK
 
-[🇷🇺 Русская версия документации](./README.RU.md)
+[![npm version](https://img.shields.io/npm/v/karboai)](https://www.npmjs.com/package/karboai)
+[![license](https://img.shields.io/npm/l/karboai)](https://github.com/thatcelt/KarboAI/blob/master/LICENSE)
 
-A powerful library for creating bots in the [KarboAI](https://karboai.com) application.
+🌐 **English** | [Русский](./README.ru.md)
+
+A powerful and flexible TypeScript SDK for building bots on the [KarboAI](https://karboai.com) social network. Provides a clean API for sending messages, handling events, managing chats, and building interactive bot experiences with a router-based architecture.
+
+## Features
+
+- **Type-safe** — full TypeScript support with Zod-validated schemas for every API response and entity
+- **Router system** — modular, Express-like routing with middleware support for messages and button interactions
+- **Real-time events** — WebSocket-powered event system covering messages, joins, leaves, voice, calls, cinema, and more
+- **Inline buttons** — rich interactive buttons with gradients, animations, particles, and swipe/tap interactions
+- **Media support** — upload images, send image messages, handle voice notes, video notes, and stickers
+- **Text formatting helpers** — built-in utilities for bold, italic, underline, strikethrough, code, hyperlinks, and centered text
+- **Configurable logging** — optional Pino-based structured logging with pretty-print output
+- **Lightweight** — minimal dependencies, ESM-first, built with Bun
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Advantages](#advantages)
-- [KarboAI Class](#karboai-class)
-  - [Constructor](#constructor)
-  - [Getters](#getters)
-  - [Public Methods](#public-methods)
-    - [me()](#me)
-    - [text()](#text)
-    - [image()](#image)
-    - [upload()](#upload)
-    - [message()](#message)
-    - [members()](#members)
-    - [user()](#user)
-    - [leave()](#leave)
-    - [kick()](#kick)
-    - [attach()](#attach)
-    - [bind()](#bind)
-- [Router Class](#router-class)
-  - [Constructor](#router-constructor)
-  - [Getters](#router-getters)
-  - [Methods](#router-methods)
-    - [pre()](#pre)
-    - [on()](#on)
-    - [command()](#command)
-- [Schemas](#schemas)
-- [Utilities](#utilities)
-  - [bold()](#bold)
-  - [italic()](#italic)
-  - [centralize()](#centralize)
-  - [code()](#code)
-  - [strikethrough()](#strikethrough)
-  - [underline()](#underline)
-  - [hyperlink()](#hyperlink)
-- [Logging](#logging)
+- [Configuration](#configuration)
+- [Client Methods](#client-methods)
+- [Router](#router)
+- [Events](#events)
+- [Entities](#entities)
+- [Text Formatting Helpers](#text-formatting-helpers)
+- [Inline Buttons](#inline-buttons)
+- [Error Handling](#error-handling)
+- [Exported Objects](#exported-objects)
+- [License](#license)
 
 ## Installation
 
 ```bash
+# npm
 npm install karboai
+
+# bun
+bun add karboai
+
+# yarn
+yarn add karboai
+
+# pnpm
+pnpm add karboai
 ```
+
+### Requirements
+
+- Node.js 18+ or Bun
+- TypeScript 5+ (peer dependency)
 
 ## Quick Start
 
@@ -54,483 +60,671 @@ npm install karboai
 import { KarboAI, Router } from 'karboai';
 
 const karbo = new KarboAI({
-  token: 'your-bot-token',
-  id: 'your-bot-id',
+  token: 'YOUR_BOT_TOKEN',
+  id: 'YOUR_BOT_ID',
   enableLogging: true,
 });
 
-const router = new Router();
+const router = new Router('main');
 
-router.command('/start', async ({ karbo, message }) => {
-  await karbo.text(message.chatId, 'Hello! Welcome to KarboAI bot.');
-});
-
+// Handle incoming messages
 router.on('message', async ({ karbo, message }) => {
-  await karbo.text(message.chatId, `You said: ${message.content}`);
+  await karbo.text({
+    chatId: message.chatId,
+    content: `Hello! You said: ${message.content}`,
+  });
 });
 
+// Handle commands
+router.command('/start', async ({ karbo, message }) => {
+  await karbo.text({
+    chatId: message.chatId,
+    content: 'Welcome! I am a KarboAI bot 🤖',
+  });
+});
+
+// Bind routers and connect
 karbo.bind(router);
 karbo.attach();
 ```
 
-## Advantages
+## Configuration
 
-- **Type-safe** — Full TypeScript support with Zod schema validation for all API responses
-- **WebSocket support** — Real-time message handling via socket.io-client
-- **Router system** — Modular architecture with routers and middleware support
-- **Middleware pipeline** — Pre-processing middleware for filtering and transforming events
-- **Command handling** — Built-in command parser with `startsWith` matching
-- **Logging** — Optional structured logging with pino
-- **Error handling** — Comprehensive error types for all HTTP status codes
-- **File uploads** — Multipart form data support for image uploads
-- **Clean API** — Intuitive method names with camelCase conventions
+The `KarboAI` client accepts a `KarboConfig` object:
 
-## KarboAI Class
+| Property       | Type      | Required | Default | Description                        |
+| -------------- | --------- | -------- | ------- | ---------------------------------- |
+| `token`        | `string`  | ✅        | —       | Bot token from KarboAI             |
+| `id`           | `string`  | ✅        | —       | Bot user ID                        |
+| `enableLogging`| `boolean` | ❌        | `false` | Enable Pino-based request logging  |
 
-Main class for interacting with the KarboAI API.
-
-### Constructor
-
-```typescript
-new KarboAI(config: KarboConfig)
-```
-
-**Parameters:**
-- `config.token` — Bot authentication token
-- `config.id` — Bot ID
-- `config.enableLogging?` — Enable logging (default: `false`)
-
-**Example:**
 ```typescript
 const karbo = new KarboAI({
-  token: 'your-bot-token',
-  id: 'your-bot-id',
+  token: 'bot-token-here',
+  id: 'bot-id-here',
   enableLogging: true,
 });
 ```
 
-### Getters
+## Client Methods
 
-#### `id`
+### `me()`
 
-Returns the bot's ID from the configuration.
+Get information about the current bot.
 
 ```typescript
-console.log(karbo.id); // 'your-bot-id'
+const me = await karbo.me();
+// { botId: string, name: string, status: 'not_official' | 'official' | 'banned' }
 ```
 
-### Public Methods
+### `text(builder)`
 
-#### `me()`
+Send a text message to a chat.
 
-Returns information about the bot.
-
-**Returns:** `Promise<MeResponse>` — Object with `botId`, `name`, and `status`
-
-**Example:**
 ```typescript
-const botInfo = await karbo.me();
-console.log(botInfo.name, botInfo.status);
-```
-
-#### `text(chatId, content, replyMessageId?)`
-
-Sends a text message to a chat.
-
-**Parameters:**
-- `chatId` — Target chat ID
-- `content` — Message text
-- `replyMessageId?` — Optional message ID to reply to
-
-**Returns:** `Promise<MessageResponse>` — Object with `messageId` and `createdAt`
-
-**Example:**
-```typescript
-await karbo.text('chat-123', 'Hello world!');
-await karbo.text('chat-123', 'Replying to message', 'msg-456');
-```
-
-#### `image(chatId, images, replyMessageId?)`
-
-Sends images to a chat.
-
-**Parameters:**
-- `chatId` — Target chat ID
-- `images` — Array of image URLs
-- `replyMessageId?` — Optional message ID to reply to
-
-**Returns:** `Promise<MessageResponse>` — Object with `messageId` and `createdAt`
-
-**Example:**
-```typescript
-await karbo.image('chat-123', ['https://example.com/img1.jpg', 'https://example.com/img2.jpg']);
-```
-
-#### `upload(path)`
-
-Uploads an image file and returns its URL.
-
-**Parameters:**
-- `path` — File path on disk
-
-**Returns:** `Promise<string>` — Uploaded image URL
-
-**Example:**
-```typescript
-const imageUrl = await karbo.upload('/path/to/image.png');
-await karbo.image('chat-123', [imageUrl]);
-```
-
-#### `message(chatId, messageId)`
-
-Retrieves a specific message from a chat.
-
-**Parameters:**
-- `chatId` — Chat ID
-- `messageId` — Message ID
-
-**Returns:** `Promise<Message>` — Message object
-
-**Example:**
-```typescript
-const msg = await karbo.message('chat-123', 'msg-456');
-console.log(msg.content, msg.author);
-```
-
-#### `members(chatId, limit?, offset?)`
-
-Retrieves members of a chat.
-
-**Parameters:**
-- `chatId` — Chat ID
-- `limit?` — Number of members to return (default: `100`)
-- `offset?` — Offset for pagination (default: `0`)
-
-**Returns:** `Promise<MembersResponse>` — Object with `items` array of `User`
-
-**Example:**
-```typescript
-const members = await karbo.members('chat-123', 50, 0);
-console.log(members.items);
-```
-
-#### `user(userId)`
-
-Retrieves information about a user.
-
-**Parameters:**
-- `userId` — User ID
-
-**Returns:** `Promise<User>` — User object
-
-**Example:**
-```typescript
-const user = await karbo.user('user-123');
-console.log(user);
-```
-
-#### `leave(chatId)`
-
-Makes the bot leave a chat.
-
-**Parameters:**
-- `chatId` — Chat ID
-
-**Returns:** `Promise<boolean>` — Success status
-
-**Example:**
-```typescript
-const success = await karbo.leave('chat-123');
-```
-
-#### `kick(chatId, userId)`
-
-Kicks a user from a chat.
-
-**Parameters:**
-- `chatId` — Chat ID
-- `userId` — User ID to kick
-
-**Returns:** `Promise<boolean>` — Success status
-
-**Example:**
-```typescript
-const success = await karbo.kick('chat-123', 'user-456');
-```
-
-#### `attach(callback?)`
-
-Connects to the KarboAI WebSocket and starts listening for events.
-
-**Parameters:**
-- `callback?` — Async function called after successful connection
-
-**Example:**
-```typescript
-karbo.attach(async () => {
-  console.log('Bot is now online and listening for messages');
+const messageId = await karbo.text({
+  chatId: 'chat-id',
+  content: 'Hello, world!',
+  replyMessageId: 'msg-id',       // optional
+  inlineButtons: [[button1]],      // optional
 });
 ```
 
-#### `bind(...routers)`
+| Parameter        | Type              | Required | Description               |
+| ---------------- | ----------------- | -------- | ------------------------- |
+| `chatId`         | `string`          | ✅        | Target chat ID            |
+| `content`        | `string`          | ✅        | Message text              |
+| `replyMessageId` | `string`          | ❌        | Message ID to reply to    |
+| `inlineButtons`  | `InlineButton[][]`| ❌        | Rows of inline buttons    |
 
-Binds one or more routers to the dispatcher.
+**Returns:** `Promise<string>` — the sent message ID.
 
-**Parameters:**
-- `...routers` — Rest parameter of `Router` instances
+### `image(builder)`
 
-**Example:**
+Send an image message to a chat.
+
+```typescript
+const messageId = await karbo.image({
+  chatId: 'chat-id',
+  images: ['https://cdn.karboai.com/image.png'],
+  caption: 'Check this out!',       // optional
+  replyMessageId: 'msg-id',         // optional
+  inlineButtons: [[button1]],       // optional
+});
+```
+
+| Parameter        | Type              | Required | Description                    |
+| ---------------- | ----------------- | -------- | ------------------------------ |
+| `chatId`         | `string`          | ✅        | Target chat ID                 |
+| `images`         | `string[]`        | ✅        | Array of image URLs            |
+| `caption`        | `string`          | ❌        | Text caption for the image     |
+| `replyMessageId` | `string`          | ❌        | Message ID to reply to         |
+| `inlineButtons`  | `InlineButton[][]`| ❌        | Rows of inline buttons         |
+
+**Returns:** `Promise<string>` — the sent message ID.
+
+### `upload(buffer, fileName?)`
+
+Upload an image to KarboAI and get a CDN URL.
+
+```typescript
+const buffer = await fs.readFile('./photo.png');
+const imageUrl = await karbo.upload(buffer, 'photo.png');
+
+await karbo.image({
+  chatId: 'chat-id',
+  images: [imageUrl],
+});
+```
+
+| Parameter  | Type                    | Required | Default    | Description          |
+| ---------- | ----------------------- | -------- | ---------- | -------------------- |
+| `buffer`   | `Buffer \| Uint8Array`  | ✅        | —          | Raw file bytes       |
+| `fileName` | `string`                | ❌        | `'file.png'`| Name with extension |
+
+**Returns:** `Promise<string>` — the uploaded image URL.
+
+### `message(chatId, messageId)`
+
+Fetch a specific message from a chat.
+
+```typescript
+const msg = await karbo.message('chat-id', 'message-id');
+// Returns a full Message entity
+```
+
+### `members(chatId, limit?, offset?)`
+
+Get members of a chat with pagination.
+
+```typescript
+const members = await karbo.members('chat-id', 50, 0);
+// Returns Member[]
+```
+
+| Parameter | Type     | Required | Default | Description           |
+| --------- | -------- | -------- | ------- | --------------------- |
+| `chatId`  | `string` | ✅        | —       | Target chat ID        |
+| `limit`   | `number` | ❌        | `100`   | Max items per request |
+| `offset`  | `number` | ❌        | `0`     | Pagination offset     |
+
+**Returns:** `Promise<Member[]>`
+
+### `user(userId, communityId?)`
+
+Get user profile information.
+
+```typescript
+const user = await karbo.user('user-id');
+const userInCommunity = await karbo.user('user-id', 42);
+```
+
+| Parameter     | Type     | Required | Default | Description                    |
+| ------------- | -------- | -------- | ------- | ------------------------------ |
+| `userId`      | `string` | ✅        | —       | Target user ID                 |
+| `communityId` | `number` | ❌        | `0`     | Community context (optional)   |
+
+**Returns:** `Promise<User>`
+
+### `leave(chatId)`
+
+Leave a chat.
+
+```typescript
+const ok = await karbo.leave('chat-id');
+// true if successful
+```
+
+### `kick(chatId, userId)`
+
+Kick a user from a chat.
+
+```typescript
+const ok = await karbo.kick('chat-id', 'user-id');
+// true if successful
+```
+
+### `attach()`
+
+Open a WebSocket connection to KarboAI and start receiving real-time events. Must be called after `bind()`.
+
+```typescript
+karbo.bind(router);
+karbo.attach();
+```
+
+### `bind(...routers)`
+
+Bind one or more `Router` instances to the dispatcher.
+
 ```typescript
 const mainRouter = new Router('main');
 const adminRouter = new Router('admin');
 
-mainRouter.command('/start', async ({ karbo, message }) => {
-  await karbo.text(message.chatId, 'Hello!');
-});
-
-adminRouter.command('/ban', async ({ karbo, message }) => {
-  // admin logic
-});
-
 karbo.bind(mainRouter, adminRouter);
 ```
 
-## Router Class
+## Router
 
-Class for organizing event handlers into modular units.
-
-### Constructor
+The `Router` class provides a modular way to handle incoming events with middleware support.
 
 ```typescript
-new Router(name?: string)
+import { Router } from 'karboai';
+
+const router = new Router('my-router'); // name is optional
 ```
 
-**Parameters:**
-- `name?` — Router name (auto-generated if not provided)
+### `router.on(event, callback)`
 
-**Example:**
-```typescript
-const router = new Router('my-router');
-```
+Subscribe to a socket event.
 
-### Getters
-
-#### `name`
-
-Returns the router's name.
-
-```typescript
-console.log(router.name); // 'my-router'
-```
-
-#### `listeners`
-
-Returns a `Map` of all registered event listeners.
-
-```typescript
-console.log(router.listeners); // Map<SocketEvent, Set<Listener>>
-```
-
-### Methods
-
-#### `pre(middleware)`
-
-Adds middleware that runs before event callbacks.
-
-**Parameters:**
-- `middleware` — Function that receives `KarboContext` and returns `Promise<boolean>`
-
-**Example:**
-```typescript
-router.pre(async ({ message }) => {
-  // Only process messages with content
-  return message.content.length > 0;
-});
-```
-
-#### `on(event, callback)`
-
-Registers an event listener.
-
-**Parameters:**
-- `event` — Event type (`'message'` | `'join'` | `'leave'` | `'voiceStart'` | `'voiceEnd'` | `'sticker'`)
-- `callback` — Async function receiving `KarboContext`
-
-**Example:**
 ```typescript
 router.on('message', async ({ karbo, message }) => {
-  console.log(`New message in ${message.chatId}: ${message.content}`);
-  await karbo.text(message.chatId, 'Got it!');
+  console.log(`New message in ${message.chatId}`);
 });
 
 router.on('join', async ({ karbo, message }) => {
-  await karbo.text(message.chatId, `Welcome, ${message.author.userId}!`);
+  await karbo.text({
+    chatId: message.chatId,
+    content: 'Welcome to the chat!',
+  });
 });
 ```
 
-#### `command(startsWith, callback)`
+### `router.command(startsWith, callback)`
 
-Registers a command handler that triggers when message content starts with the given string.
+Handle messages that start with a specific string (case-insensitive).
 
-**Parameters:**
-- `startsWith` — Command prefix to match
-- `callback` — Async function receiving `KarboContext`
-
-**Example:**
 ```typescript
 router.command('/help', async ({ karbo, message }) => {
-  await karbo.text(message.chatId, 'Available commands: /start, /help');
-});
-
-router.command('/start', async ({ karbo, message }) => {
-  await karbo.text(message.chatId, 'Welcome!');
-});
-```
-
-## Schemas
-
-The library exports several TypeScript types and Zod schemas:
-
-- `KarboConfig` — Configuration for the KarboAI class
-- `SendMessageConfig` — Configuration for sending messages
-- `Message` — Message object structure
-- `User`, `Author`, `Member` — User-related types
-- `KarboContext` — Context passed to event callbacks
-
-```typescript
-import { KarboConfig, Message, KarboContext, User } from 'karboai';
-```
-
-## Utilities
-
-Helper functions for formatting text in messages. All utilities are exported from the main package.
-
-```typescript
-import { bold, italic, centralize, code, strikethrough, underline, hyperlink } from 'karboai';
-```
-
-### `bold(text)`
-
-Wraps text in bold formatting.
-
-**Parameters:**
-- `text` — Text to format
-
-**Returns:** `string` — Formatted text with `**` markers
-
-**Example:**
-```typescript
-await karbo.text('chat-123', bold('This is bold text'));
-// Sends: **This is bold text**
-```
-
-### `italic(text)`
-
-Wraps text in italic formatting.
-
-**Parameters:**
-- `text` — Text to format
-
-**Returns:** `string` — Formatted text with `__` markers
-
-**Example:**
-```typescript
-await karbo.text('chat-123', italic('This is italic text'));
-// Sends: __This is italic text__
-```
-
-### `centralize(text)`
-
-Centers text in the message.
-
-**Parameters:**
-- `text` — Text to center
-
-**Returns:** `string` — Formatted text with `[C]` prefix
-
-**Example:**
-```typescript
-await karbo.text('chat-123', centralize('Centered text'));
-// Sends: [C]Centered text
-```
-
-### `code(text)`
-
-Wraps text in inline code formatting.
-
-**Parameters:**
-- `text` — Text to format
-
-**Returns:** `string` — Formatted text with backtick markers
-
-**Example:**
-```typescript
-await karbo.text('chat-123', code('const x = 42'));
-// Sends: `const x = 42`
-```
-
-### `strikethrough(text)`
-
-Wraps text in strikethrough formatting.
-
-**Parameters:**
-- `text` — Text to format
-
-**Returns:** `string` — Formatted text with `~~` markers
-
-**Example:**
-```typescript
-await karbo.text('chat-123', strikethrough('This is deleted'));
-// Sends: ~~This is deleted~~
-```
-
-### `underline(text)`
-
-Wraps text in underline formatting.
-
-**Parameters:**
-- `text` — Text to format
-
-**Returns:** `string` — Formatted text with `++` markers
-
-**Example:**
-```typescript
-await karbo.text('chat-123', underline('Underlined text'));
-// Sends: ++Underlined text++
-```
-
-### `hyperlink(text, url)`
-
-Creates a hyperlink with display text.
-
-**Parameters:**
-- `text` — Display text for the link
-- `url` — URL for the hyperlink
-
-**Returns:** `string` — Formatted hyperlink
-
-**Example:**
-```typescript
-await karbo.text('chat-123', hyperlink('Visit KarboAI', 'https://karboai.com'));
-// Sends: [Visit KarboAI](https://karboai.com)
-```
-
-## Logging
-
-Enable structured logging by setting `enableLogging: true` in the config:
-
-```typescript
-const karbo = new KarboAI({
-  token: 'your-token',
-  id: 'your-id',
-  enableLogging: true,
+  await karbo.text({
+    chatId: message.chatId,
+    content: 'Available commands: /help, /start, /info',
+  });
 });
 ```
 
-Logs include HTTP requests, status codes, and incoming events.
+With additional middleware:
 
----
+```typescript
+router.command('/admin', {
+  pipe: async ({ message }) => {
+    // Only allow specific users
+    return message.author.userId === 'admin-user-id';
+  }
+}, async ({ karbo, message }) => {
+  await karbo.text({
+    chatId: message.chatId,
+    content: 'Admin panel',
+  });
+});
+```
 
-**License:** MIT  
-**Author:** celt_is_god  
-**Repository:** [github.com/thatcelt/KarboAI](https://github.com/thatcelt/KarboAI)
+### `router.button(buttonId, callback)`
+
+Handle inline button presses by button ID.
+
+```typescript
+router.button('approve', async ({ karbo, query }) => {
+  await karbo.text({
+    chatId: query.chatId,
+    content: `Approved by ${query.userId}`,
+  });
+});
+```
+
+With middleware:
+
+```typescript
+router.button('delete', {
+  pipe: async ({ query }) => {
+    return query.userId === 'admin-id';
+  }
+}, async ({ karbo, query }) => {
+  // Only runs if middleware returns true
+  await karbo.text({ chatId: query.chatId, content: 'Deleted!' });
+});
+```
+
+### `router.pipe(middleware)`
+
+Add a global middleware to all listeners registered on this router.
+
+```typescript
+// Log all messages
+router.pipe(async ({ message }) => {
+  console.log(`[${message.chatId}] ${message.content}`);
+  return true; // continue to handler
+});
+```
+
+> **Note:** Return `true` (or truthy) from middleware to continue to the next middleware / callback. Return `false` (or falsy) to stop the chain.
+
+## Events
+
+The SDK supports the following real-time events via WebSocket:
+
+| Event               | Description                     |
+| ------------------- | ------------------------------- |
+| `message`           | Regular chat message            |
+| `join`              | User joined the chat            |
+| `leave`             | User left the chat              |
+| `kicked`            | User was kicked                 |
+| `dm`                | Direct message                  |
+| `messageDeleted`    | Message deleted by author       |
+| `messageDeletedByAdmin` | Message deleted by admin    |
+| `voiceStart`        | Voice chat started              |
+| `voiceEnd`          | Voice chat ended                |
+| `backgroundChanged` | Chat background changed         |
+| `userInvited`       | User invited to chat            |
+| `botInvited`        | Bot invited to chat             |
+| `actionBeer`        | Beer action                     |
+| `actionKicked`      | Kick action                     |
+| `actionFight`       | Fight action                    |
+| `dmCallStarted`     | DM call started                 |
+| `dmCallDeclined`    | DM call declined                |
+| `dmCallMissed`      | DM call missed                  |
+| `dmCallEnded`       | DM call ended                   |
+| `cinemaStarted`     | Cinema mode started             |
+| `cinemaEnded`       | Cinema mode ended               |
+
+## Entities
+
+All entities are Zod schemas with inferred TypeScript types, exported for your convenience.
+
+### `Message`
+
+```typescript
+{
+  messageId: string;
+  chatId: string;
+  content: string;
+  createdTime: number;
+  type: MessageType;
+  communityId: number;
+  chatType: ChatType;
+  replyMessageId?: string | null;
+  images?: string[];
+  audio?: string | null;
+  audioDurationMs?: number | null;
+  waveform?: number[] | null;
+  videoNote?: string | null;
+  videoNoteDurationMs?: number | null;
+  sticker?: string | null;
+  transparent?: boolean;
+  bubbleId?: string | null;
+  bubbleVersion?: number;
+  reactions?: Reaction[];
+  author: Author;
+}
+```
+
+### `User`
+
+```typescript
+{
+  userId: string;
+  nickname: string;
+  role: Role;
+  appRole: number;
+  panelColor?: string;
+  level: number;
+  nicknameColor?: string;
+  nicknameEmoji?: string;
+  avatarFrame: Frame;
+  avatar: string;
+  shortInfo: string;
+  bubbleId?: string;
+}
+```
+
+### `Author`
+
+```typescript
+{
+  userId: string;
+  nickname: string;
+  avatarUrl: string;
+  role: Role;
+  appRole: number;
+  panelColor?: string | null;
+  level: number;
+  nicknameColor?: string | null;
+  nicknameEmoji?: string | null;
+  avatarFrame: Frame | null;
+  isApiBot?: boolean;
+}
+```
+
+### `Member`
+
+```typescript
+{
+  userId: string;
+  nickname: string;
+  role: Role;
+  appRole: number;
+  panelColor?: string;
+  level: number;
+  nicknameColor?: string;
+  nicknameEmoji?: string;
+  avatarFrame: Frame;
+  avatarUrl: string;
+  memberStatus: 'joined' | 'invited';
+  isApiBot: boolean;
+}
+```
+
+### `Reaction`
+
+```typescript
+{
+  reaction: string;
+  isSticker: boolean;
+  count: number;
+  me: boolean;
+}
+```
+
+### `InlineButton`
+
+```typescript
+{
+  id: string;           // 1-64 chars
+  label: string;        // 0-64 chars
+  shape?: 'rectangle' | 'circle' | 'capsule';
+  cornerRadius?: number;
+  color: {
+    hex: string;
+    textHex: string;
+    gradient?: {
+      startHex: string;
+      endHex: string;
+      direction: 'horizontal' | 'vertical' | 'diagonal' | 'radial';
+    };
+  };
+  interaction?: {
+    type: 'tap' | 'swipe';
+    swipe?: { text: string; fillHex: string };
+  };
+  animations?: InlineButtonAnimation[];
+  particles?: {
+    type: 'spark' | 'confetti' | 'heart' | 'pixel' | 'smoke';
+    colorHex: string;
+    intensity?: number; // 1-5
+  };
+}
+```
+
+### Enums
+
+```typescript
+enum MessageType {
+  Text = 0, Join = 1, Leave = 2, Kicked = 3, DM = 4,
+  Deleted = 5, AdminDeleted = 6, VoiceStart = 7, VoiceEnd = 8,
+  Background = 9, InvitedUser = 10, InvitedBot = 11,
+  ActionBeer = 21, ActionKicked = 22, ActionFight = 23,
+  DMCallStarted = 24, DMCallDeclined = 25, DMCallMissed = 26,
+  DMCallEnded = 27, CinemaStarted = 28, CinemaEnded = 29,
+}
+
+enum ChatType {
+  Public = 0, DM = 1, PM = 2, Private = 3,
+}
+
+enum Role {
+  Regular = 0,
+}
+```
+
+## Text Formatting Helpers
+
+The SDK exports helper functions for KarboAI's markup syntax:
+
+```typescript
+import { bold, italic, underline, strikethrough, code, centralize, hyperlink } from 'karboai';
+
+bold('important');         // **important**
+italic('emphasis');        // __emphasis__
+underline('underlined');   // ++underlined++
+strikethrough('removed');  // ~~removed~~
+code('console.log()');     // `console.log()`
+centralize('centered');    // [C]centered
+hyperlink('click', 'https://example.com'); // [click](https://example.com)
+```
+
+## Inline Buttons
+
+Inline buttons support rich customization — colors, gradients, shapes, animations, and particles.
+
+### Basic button
+
+```typescript
+import { KarboAI, Router } from 'karboai';
+
+const button = {
+  id: 'like',
+  label: 'Like ❤️',
+  color: { hex: '#FF4444', textHex: '#FFFFFF' },
+};
+
+const router = new Router();
+
+router.button('like', async ({ karbo, query }) => {
+  await karbo.text({ chatId: query.chatId, content: 'Thanks for the like!' });
+});
+
+karbo.bind(router);
+
+// Send a message with a button
+await karbo.text({
+  chatId: 'chat-id',
+  content: 'Do you like this?',
+  inlineButtons: [[button]],
+});
+```
+
+### Button with gradient and animation
+
+```typescript
+const fancyButton = {
+  id: 'premium',
+  label: 'Go Premium ✨',
+  shape: 'capsule' as const,
+  color: {
+    hex: '#6C5CE7',
+    textHex: '#FFFFFF',
+    gradient: {
+      startHex: '#6C5CE7',
+      endHex: '#A29BFE',
+      direction: 'horizontal' as const,
+    },
+  },
+  animations: [{
+    kind: 'neon' as const,
+    colorHex: '#6C5CE7',
+    speedMs: 1500,
+  }],
+  particles: {
+    type: 'spark' as const,
+    colorHex: '#FFD700',
+    intensity: 3,
+  },
+};
+```
+
+### Swipe button
+
+```typescript
+const swipeButton = {
+  id: 'confirm',
+  label: 'Slide to confirm',
+  color: { hex: '#00B894', textHex: '#FFFFFF' },
+  interaction: {
+    type: 'swipe' as const,
+    swipe: { text: 'Confirm →', fillHex: '#00B894' },
+  },
+};
+```
+
+## Error Handling
+
+The SDK throws `KarboError` instances for API errors:
+
+| Code | Name                    | Description                              |
+| ---- | ----------------------- | ---------------------------------------- |
+| 400  | `KarboAI.BadRequest`    | Empty message, content too long, too many images |
+| 401  | `KarboAI.Unauthorized`  | Invalid bot token                        |
+| 403  | `KarboAI.Forbidden`     | Access denied                            |
+| 404  | `KarboAI.NotFound`      | Content doesn't exist                    |
+| 413  | `KarboAI.FileTooLarge`  | File exceeds size limit                  |
+| 429  | `KarboAI.TooManyRequests` | Rate limit exceeded                    |
+
+```typescript
+import { KarboAI } from 'karboai';
+
+try {
+  await karbo.text({ chatId: 'chat-id', content: 'Hello' });
+} catch (error) {
+  if (error instanceof Error && error.name === 'KarboAI.Unauthorized') {
+    console.error('Invalid token!');
+  }
+}
+```
+
+## Exported Objects
+
+### Classes
+
+| Export     | Description                                |
+| ---------- | ------------------------------------------ |
+| `KarboAI`  | Main client class                          |
+| `Router`   | Event router with middleware support       |
+
+### Schemas (Zod)
+
+| Export                        | Description                        |
+| ----------------------------- | ---------------------------------- |
+| `MessageSchema`               | Message entity schema              |
+| `UserSchema`                  | User entity schema                 |
+| `AuthorSchema`                | Author entity schema               |
+| `BaseUserSchema`              | Base user entity schema            |
+| `ChatSchema`                  | Chat entity schema                 |
+| `FrameSchema`                 | Avatar frame schema                |
+| `InlineButtonSchema`          | Inline button schema               |
+| `MemberSchema`                | Chat member schema                 |
+| `ReactionSchema`              | Reaction schema                    |
+| `MeResponseSchema`            | Bot info response schema           |
+| `SendMessageResponseSchema`   | Send message response schema       |
+| `UploadMediaResponseSchema`   | Upload response schema             |
+| `GetMembersResponseSchema`    | Get members response schema        |
+| `ActionResponseSchema`        | Action (kick/leave) response schema|
+| `InteractionCallbackQuerySchema` | Button press query schema       |
+
+### Enums
+
+| Export        | Description                |
+| ------------- | -------------------------- |
+| `MessageType` | Message type enum          |
+| `ChatType`    | Chat type enum             |
+| `Role`        | User role enum             |
+
+### Helper Functions
+
+| Export           | Description                          |
+| ---------------- | ------------------------------------ |
+| `bold`           | Wrap text in bold markup             |
+| `italic`         | Wrap text in italic markup           |
+| `underline`      | Wrap text in underline markup        |
+| `strikethrough`  | Wrap text in strikethrough markup    |
+| `code`           | Wrap text in inline code markup      |
+| `centralize`     | Center text                          |
+| `hyperlink`      | Create a hyperlink                   |
+
+### Types
+
+| Export                  | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `KarboConfig`           | Client configuration                     |
+| `MessageBuilder`        | Generic message builder                  |
+| `TextBuilder`           | Text message builder                     |
+| `ImageBuilder`          | Image message builder                    |
+| `Message`               | Message entity type                      |
+| `User`                  | User entity type                         |
+| `Author`                | Author entity type                       |
+| `BaseUser`              | Base user entity type                    |
+| `Chat`                  | Chat entity type                         |
+| `Frame`                 | Avatar frame type                        |
+| `InlineButton`          | Inline button type                       |
+| `Member`                | Chat member type                         |
+| `Reaction`              | Reaction type                            |
+| `MessageContext`        | Context passed to message handlers       |
+| `InteractionContext`    | Context passed to button handlers        |
+| `MessageCallback`       | Message handler function type            |
+| `InteractionCallback`   | Button handler function type             |
+| `SocketMessageEvent`    | Union of all event names                 |
+| `MeResponse`            | Bot info response type                   |
+
+## License
+
+MIT © [thatcelt](https://github.com/thatcelt)
