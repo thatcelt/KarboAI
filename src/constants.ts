@@ -1,9 +1,9 @@
-import { UndiciHeaders } from 'undici/types/dispatcher';
-import { ErrorData } from './schemas/error';
+import type { ErrorData } from './types/errors';
+import type { Headers } from './types/http';
 
-export const KARBO_API = 'https://api.karboai.com';
+export const BASE_URL = 'https://api.karboai.com';
 
-export const BASIC_HEADERS: UndiciHeaders = {
+export const BASIC_HEADERS: Headers = {
   'Content-Type': 'application/json',
 };
 
@@ -26,7 +26,7 @@ export const ERRORS: Record<number, ErrorData> = {
   },
   413: {
     name: 'KarboAI.FileTooLarge',
-    message: 'Please upload files smaller than XX bytes length', // TODO: rewrite to accurate length
+    message: 'Please upload files smaller than some bytes length',
   },
   429: {
     name: 'KarboAI.TooManyRequests',
@@ -34,12 +34,26 @@ export const ERRORS: Record<number, ErrorData> = {
   },
 };
 
-export const SOCKET_TOPICS = {
-  // TODO: add more topics
+export const SOCKETIO_TOPICS = {
   0: 'message',
   1: 'join',
   2: 'leave',
+  3: 'kicked',
+  4: 'dm',
+  5: 'messageDeleted',
+  6: 'messageDeletedByAdmin',
   7: 'voiceStart',
   8: 'voiceEnd',
-  12: 'sticker',
+  9: 'backgroundChanged',
+  10: 'userInvited',
+  11: 'botInvited',
+  21: 'actionBeer',
+  22: 'actionKicked',
+  23: 'actionFight',
+  24: 'dmCallStarted',
+  25: 'dmCallDeclined',
+  26: 'dmCallMissed',
+  27: 'dmCallEnded',
+  28: 'cinemaStarted',
+  29: 'cinemaEnded',
 };

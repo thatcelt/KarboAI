@@ -1,6 +1,6 @@
 {
   "name": "karboai",
-  "version": "1.7.5",
+  "version": "2.7.5",
   "description": "A powerful lib for https://karboai.com",
   "keywords": [
     "karbo",
@@ -14,6 +14,7 @@
   "main": "dist/index.js",
   "files": [
     "README.MD",
+    "README.ru.md",
     "dist"
   ],
   "homepage": "https://github.com/thatcelt/KarboAI#readme",
@@ -24,23 +25,28 @@
     "type": "git",
     "url": "git+https://github.com/thatcelt/KarboAI.git"
   },
+  "scripts": {
+    "test": "bun run src/test.ts",
+    "build": "bun run build.ts"
+  },
   "license": "MIT",
   "author": "celt_is_god",
-  "type": "commonjs",
-  "scripts": {
-    "test": "tsc && node dist/tests/main.js",
-    "start": "tsc && node dist/index.js"
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/lodash": "^4.17.24"
+  },
+  "peerDependencies": {
+    "typescript": "6.0.3"
   },
   "dependencies": {
-    "@types/node": "^25.5.2",
+    "@types/camelize": "^1.0.1",
+    "camelize": "^1.0.1",
+    "decamelize-keys": "^2.0.1",
     "lodash": "^4.18.1",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",
     "socket.io-client": "^4.8.3",
-    "undici": "^8.0.2",
-    "zod": "^4.3.6"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.17.24"
+    "zod": "^4.4.3"
   }
 }
