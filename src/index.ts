@@ -10,4 +10,5 @@ export {
   strikethrough,
   hyperlink,
 } from './util/helpers';
+export { Router } from './features/router';
 export type { InteractionCallback, MessageCallback } from './types/dispatcher';
