@@ -308,10 +308,10 @@ router.command('/help', async ({ karbo, message }) => {
 
 ```typescript
 router.command('/admin', {
-  pipe: async ({ message }) => {
+  pipes: [async ({ message }) => {
     // Пропускаем только определённых пользователей
     return message.author.userId === 'admin-user-id';
-  }
+  }],
 }, async ({ karbo, message }) => {
   await karbo.text({
     chatId: message.chatId,
@@ -337,9 +337,9 @@ router.button('approve', async ({ karbo, query }) => {
 
 ```typescript
 router.button('delete', {
-  pipe: async ({ query }) => {
+  pipes: [async ({ query }) => {
     return query.userId === 'admin-id';
-  }
+  }],
 }, async ({ karbo, query }) => {
   // Выполнится только если middleware вернул true
   await karbo.text({ chatId: query.chatId, content: 'Удалено!' });

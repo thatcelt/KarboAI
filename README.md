@@ -308,10 +308,10 @@ With additional middleware:
 
 ```typescript
 router.command('/admin', {
-  pipe: async ({ message }) => {
+  pipes: [async ({ message }) => {
     // Only allow specific users
     return message.author.userId === 'admin-user-id';
-  }
+  }],
 }, async ({ karbo, message }) => {
   await karbo.text({
     chatId: message.chatId,
@@ -337,9 +337,9 @@ With middleware:
 
 ```typescript
 router.button('delete', {
-  pipe: async ({ query }) => {
+  pipes: [async ({ query }) => {
     return query.userId === 'admin-id';
-  }
+  }],
 }, async ({ karbo, query }) => {
   // Only runs if middleware returns true
   await karbo.text({ chatId: query.chatId, content: 'Deleted!' });
