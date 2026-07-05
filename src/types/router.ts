@@ -6,7 +6,7 @@ import type {
   MessageMiddleware,
 } from './dispatcher';
 
-export type CommonMiddleware = (context: { karbo: KarboAI }) => Promise<void>;
+export type CommonMiddleware = (context: { karbo: KarboAI }) => Promise<boolean>;
 
 export type CommandOptions = {
   middlewares: MessageMiddleware[];

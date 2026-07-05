@@ -365,6 +365,7 @@ router.use('message', async ({ message }) => {
 
 // Common middleware — выполняется и для сообщений, и для нажатий кнопок
 router.use('common', async ({ karbo }) => {
+  return true; // продолжить к обработчику
   // например, инициализация чего-то общего для всех обработчиков
 });
 ```

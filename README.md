@@ -365,6 +365,7 @@ router.use('message', async ({ message }) => {
 
 // Common middleware — runs for both messages and button presses
 router.use('common', async ({ karbo }) => {
+  return true; // continue to handler
   // e.g. initialize something available to all handlers
 });
 ```
