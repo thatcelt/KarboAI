@@ -308,7 +308,7 @@ router.command('/help', async ({ karbo, message }) => {
 
 ```typescript
 router.command('/admin', {
-  pipes: [async ({ message }) => {
+  middlewares: [async ({ message }) => {
     // Пропускаем только определённых пользователей
     return message.author.userId === 'admin-user-id';
   }],
@@ -337,7 +337,7 @@ router.button('approve', async ({ karbo, query }) => {
 
 ```typescript
 router.button('delete', {
-  pipes: [async ({ query }) => {
+  middlewares: [async ({ query }) => {
     return query.userId === 'admin-id';
   }],
 }, async ({ karbo, query }) => {
@@ -346,13 +346,13 @@ router.button('delete', {
 });
 ```
 
-### `router.pipe(middleware)`
+### `router.use(middleware)`
 
 Добавить глобальный middleware для всех обработчиков, зарегистрированных в этом роутере.
 
 ```typescript
 // Логирование всех сообщений
-router.pipe(async ({ message }) => {
+router.use(async ({ message }) => {
   console.log(`[${message.chatId}] ${message.content}`);
   return true; // продолжить к обработчику
 });

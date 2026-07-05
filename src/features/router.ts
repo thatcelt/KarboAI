@@ -52,7 +52,7 @@ export class Router {
     return this._name;
   }
 
-  public pipe = (middleware: MessageMiddleware | InteractionMiddleware) =>
+  public use = (middleware: MessageMiddleware | InteractionMiddleware) =>
     isInteractionMiddleware(middleware)
       ? this.interactionMiddlewares.push(middleware)
       : this.messageMiddlewares.push(middleware);
@@ -83,7 +83,7 @@ export class Router {
         middlewares: [
           commandMiddleware(startsWith),
           ...this.messageMiddlewares,
-          ...callbackOrOptions.pipes,
+          ...callbackOrOptions.middlewares,
         ],
         callback: callback!,
       });
@@ -106,7 +106,7 @@ export class Router {
         .push({ middlewares: this.interactionMiddlewares, callback: callbackOrOptions });
     } else {
       this._interactionListeners.get(buttonId)!.push({
-        middlewares: [...this.interactionMiddlewares, ...callbackOrOptions.pipes],
+        middlewares: [...this.interactionMiddlewares, ...callbackOrOptions.middlewares],
         callback: callback!,
       });
     }

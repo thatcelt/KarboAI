@@ -308,7 +308,7 @@ With additional middleware:
 
 ```typescript
 router.command('/admin', {
-  pipes: [async ({ message }) => {
+  middlewares: [async ({ message }) => {
     // Only allow specific users
     return message.author.userId === 'admin-user-id';
   }],
@@ -337,7 +337,7 @@ With middleware:
 
 ```typescript
 router.button('delete', {
-  pipes: [async ({ query }) => {
+  middlewares: [async ({ query }) => {
     return query.userId === 'admin-id';
   }],
 }, async ({ karbo, query }) => {
@@ -346,13 +346,13 @@ router.button('delete', {
 });
 ```
 
-### `router.pipe(middleware)`
+### `router.use(middleware)`
 
 Add a global middleware to all listeners registered on this router.
 
 ```typescript
 // Log all messages
-router.pipe(async ({ message }) => {
+router.use(async ({ message }) => {
   console.log(`[${message.chatId}] ${message.content}`);
   return true; // continue to handler
 });

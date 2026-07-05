@@ -6,7 +6,7 @@ import type {
 } from './dispatcher';
 
 export type CommandOptions = {
-  pipes: MessageMiddleware[];
+  middlewares: MessageMiddleware[];
 };
 
 export type CommandFunctionOverload = {
@@ -15,7 +15,7 @@ export type CommandFunctionOverload = {
 };
 
 export type ButtonOptions = {
-  pipes: InteractionMiddleware[];
+  middlewares: InteractionMiddleware[];
 };
 
 export type ButtonFunctionOverload = {
