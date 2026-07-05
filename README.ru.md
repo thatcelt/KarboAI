@@ -346,6 +346,32 @@ router.button('delete', {
 });
 ```
 
+С регулярным выражением — обработка нескольких ID кнопок по паттерну:
+
+```typescript
+// Матчим кнопки "item_1", "item_2", "item_42" и т.д.
+router.button('item', {
+  regex: /^item_\d+$/,
+}, async ({ karbo, query }) => {
+  await karbo.text({
+    chatId: query.chatId,
+    content: `Вы выбрали элемент: ${query.buttonId}`,
+  });
+});
+
+// Матчим все action-кнопки: "action_like", "action_share", "action_report"
+router.button('action', {
+  regex: /^action_(like|share|report)$/,
+}, async ({ karbo, query }) => {
+  await karbo.text({
+    chatId: query.chatId,
+    content: `Действие выполнено: ${query.buttonId}`,
+  });
+});
+```
+
+> **Примечание:** При указании `regex` обработчик срабатывает, если либо ключ `buttonId` совпадает с ID нажатой кнопки, **либо** регулярное выражение совпадает с ID. Это позволяет группировать связанные кнопки под одним обработчиком.
+
 ### `router.use(key, middleware)`
 
 Добавить middleware для всех обработчиков, зарегистрированных в этом роутере, с привязкой к ключу `key`.

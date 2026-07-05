@@ -46,13 +46,13 @@ export class Dispatcher {
           if (!(await middleware({ karbo: this.karbo, message }))) return;
         }
 
-        listener.callback({ karbo: this.karbo, message });
+        await listener.callback({ karbo: this.karbo, message });
       });
     });
   };
 
   private interactions = () => {
-    this.socket?.on('button_pressed', (data) => {
+    this.socket?.on('button_pressed', async (data) => {
       const query = InteractionCallbackQuerySchema.parse(camelize(data));
 
       this.logger.info(
@@ -64,12 +64,21 @@ export class Dispatcher {
         'button pressed'
       );
 
-      this.interactionListeners.get(query.buttonId)?.forEach(async (listener) => {
+      const matchedListeners: InteractionListener[] = [];
+
+      for (const [buttonId, listeners] of this.interactionListeners)
+        matchedListeners.push(
+          ...listeners.filter(
+            (listener) => buttonId === query.buttonId || listener.regex?.test(query.buttonId)
+          )
+        );
+
+      matchedListeners.forEach(async (listener) => {
         for (const middleware of listener.middlewares) {
           if (!(await middleware({ karbo: this.karbo, query }))) return;
         }
 
-        listener.callback({ karbo: this.karbo, query });
+        await listener.callback({ karbo: this.karbo, query });
       });
     });
   };

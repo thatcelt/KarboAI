@@ -18,7 +18,8 @@ export type CommandFunctionOverload = {
 };
 
 export type ButtonOptions = {
-  middlewares: InteractionMiddleware[];
+  middlewares?: InteractionMiddleware[];
+  regex?: RegExp;
 };
 
 export type ButtonFunctionOverload = {

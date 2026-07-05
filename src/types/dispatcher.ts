@@ -20,4 +20,5 @@ export type MessageListener = {
 export type InteractionListener = {
   callback: InteractionCallback;
   middlewares: InteractionMiddleware[];
+  regex?: RegExp;
 };

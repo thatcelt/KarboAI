@@ -102,13 +102,15 @@ export class Router {
     if (!this._interactionListeners.has(buttonId)) this._interactionListeners.set(buttonId, []);
 
     if (typeof callbackOrOptions === 'function') {
-      this._interactionListeners
-        .get(buttonId)!
-        .push({ middlewares: this.interactionMiddlewares, callback: callbackOrOptions });
+      this._interactionListeners.get(buttonId)!.push({
+        middlewares: this.interactionMiddlewares,
+        callback: callbackOrOptions,
+      });
     } else {
       this._interactionListeners.get(buttonId)!.push({
-        middlewares: [...this.interactionMiddlewares, ...callbackOrOptions.middlewares],
+        middlewares: [...this.interactionMiddlewares, ...(callbackOrOptions.middlewares || [])],
         callback: callback!,
+        regex: callbackOrOptions.regex,
       });
     }
   };

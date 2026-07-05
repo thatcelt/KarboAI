@@ -346,6 +346,32 @@ router.button('delete', {
 });
 ```
 
+With regex — match multiple button IDs by pattern:
+
+```typescript
+// Match buttons like "item_1", "item_2", "item_42", etc.
+router.button('item', {
+  regex: /^item_\d+$/,
+}, async ({ karbo, query }) => {
+  await karbo.text({
+    chatId: query.chatId,
+    content: `You selected item: ${query.buttonId}`,
+  });
+});
+
+// Match all action buttons: "action_like", "action_share", "action_report"
+router.button('action', {
+  regex: /^action_(like|share|report)$/,
+}, async ({ karbo, query }) => {
+  await karbo.text({
+    chatId: query.chatId,
+    content: `Action triggered: ${query.buttonId}`,
+  });
+});
+```
+
+> **Note:** When `regex` is provided, the listener matches a button press if either the `buttonId` key equals the pressed button ID **or** the regex matches it. This allows grouping related buttons under a single handler.
+
 ### `router.use(key, middleware)`
 
 Add a middleware to all listeners registered on this router, scoped by `key`.
