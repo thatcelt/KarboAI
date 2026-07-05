@@ -14,6 +14,8 @@ import type {
   ButtonOptions,
   CommandFunctionOverload,
   CommandOptions,
+  MiddlewareKeys,
+  MiddlewareMap,
 } from '../types/router';
 
 const commandMiddleware =
@@ -22,12 +24,6 @@ const commandMiddleware =
     if (!context.message.content.toLowerCase().startsWith(content)) return false;
     return true;
   };
-
-const isInteractionMiddleware = (
-  callback: MessageMiddleware | InteractionMiddleware
-): callback is InteractionMiddleware => {
-  return typeof callback == 'function';
-};
 
 export class Router {
   private _name: string;
@@ -52,10 +48,15 @@ export class Router {
     return this._name;
   }
 
-  public use = (middleware: MessageMiddleware | InteractionMiddleware) =>
-    isInteractionMiddleware(middleware)
-      ? this.interactionMiddlewares.push(middleware)
-      : this.messageMiddlewares.push(middleware);
+  public use = <T extends MiddlewareKeys>(key: T, middleware: MiddlewareMap[T]) => {
+    if (key === 'message') this.messageMiddlewares.push(middleware as MessageMiddleware);
+    else if (key === 'interaction')
+      this.interactionMiddlewares.push(middleware as InteractionMiddleware);
+    else {
+      this.interactionMiddlewares.push(middleware as InteractionMiddleware);
+      this.messageMiddlewares.push(middleware as MessageMiddleware);
+    }
+  };
 
   public on = (event: SocketMessageEvent, callback: MessageCallback): void => {
     if (!this._messageListeners.has(event)) this._messageListeners.set(event, []);

@@ -346,15 +346,26 @@ router.button('delete', {
 });
 ```
 
-### `router.use(middleware)`
+### `router.use(key, middleware)`
 
-Add a global middleware to all listeners registered on this router.
+Add a middleware to all listeners registered on this router, scoped by `key`.
+
+| Key             | Description                                                |
+| --------------- | ---------------------------------------------------------- |
+| `'message'`     | Middleware runs only for message listeners                 |
+| `'interaction'` | Middleware runs only for button (interaction) listeners    |
+| `'common'`      | Middleware runs for **both** message and interaction listeners |
 
 ```typescript
-// Log all messages
-router.use(async ({ message }) => {
+// Log all incoming messages
+router.use('message', async ({ message }) => {
   console.log(`[${message.chatId}] ${message.content}`);
   return true; // continue to handler
+});
+
+// Common middleware — runs for both messages and button presses
+router.use('common', async ({ karbo }) => {
+  // e.g. initialize something available to all handlers
 });
 ```
 

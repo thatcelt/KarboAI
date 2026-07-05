@@ -1,9 +1,12 @@
+import type { KarboAI } from '../client/karboai';
 import type {
   InteractionCallback,
   InteractionMiddleware,
   MessageCallback,
   MessageMiddleware,
 } from './dispatcher';
+
+export type CommonMiddleware = (context: { karbo: KarboAI }) => Promise<void>;
 
 export type CommandOptions = {
   middlewares: MessageMiddleware[];
@@ -22,3 +25,11 @@ export type ButtonFunctionOverload = {
   (buttonId: string, callback: InteractionCallback): Promise<void>;
   (buttonId: string, options: ButtonOptions, callback: InteractionCallback): Promise<void>;
 };
+
+export type MiddlewareMap = {
+  message: MessageMiddleware;
+  interaction: InteractionMiddleware;
+  common: CommonMiddleware;
+};
+
+export type MiddlewareKeys = keyof MiddlewareMap;
