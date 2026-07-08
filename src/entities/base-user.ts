@@ -6,7 +6,7 @@ import { FrameSchema } from './frame';
 export const BaseUserSchema = z.object({
   userId: z.string(),
   nickname: z.string(),
-  role: z.enum(Role),
+  role: z.union([z.enum(Role), z.number()]),
   appRole: z.number(),
   panelColor: z.string().optional(),
   level: z.number(),

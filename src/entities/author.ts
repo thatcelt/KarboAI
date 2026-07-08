@@ -7,7 +7,7 @@ export const AuthorSchema = z.object({
   userId: z.string(),
   nickname: z.string(),
   avatarUrl: z.string(),
-  role: z.enum(Role),
+  role: z.union([z.enum(Role), z.number()]),
   appRole: z.number(),
   panelColor: z.string().optional().nullable(),
   level: z.number(),
