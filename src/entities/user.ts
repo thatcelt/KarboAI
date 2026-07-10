@@ -6,7 +6,7 @@ export const UserSchema = z.object({
   ...BaseUserSchema.shape,
   avatar: z.string(),
   shortInfo: z.string(),
-  bubbleId: z.string().optional(),
+  bubbleId: z.string().nullable().optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;

@@ -10,9 +10,9 @@ export const BaseUserSchema = z.object({
   appRole: z.number(),
   panelColor: z.string().optional(),
   level: z.number(),
-  nicknameColor: z.string().optional(),
-  nicknameEmoji: z.string().optional(),
-  avatarFrame: FrameSchema,
+  nicknameColor: z.string().nullable().optional(),
+  nicknameEmoji: z.string().nullable().optional(),
+  avatarFrame: FrameSchema.nullable(),
 });
 
 export type BaseUser = z.infer<typeof BaseUserSchema>;
