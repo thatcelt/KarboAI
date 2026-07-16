@@ -8,7 +8,7 @@ export const BaseUserSchema = z.object({
   nickname: z.string(),
   role: z.union([z.enum(Role), z.number()]),
   appRole: z.number(),
-  panelColor: z.string().optional(),
+  panelColor: z.string().optional().nullable(),
   level: z.number(),
   nicknameColor: z.string().nullable().optional(),
   nicknameEmoji: z.string().nullable().optional(),
