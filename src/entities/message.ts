@@ -11,7 +11,7 @@ export const MessageSchema = z.object({
   createdTime: z.number(),
   type: z.enum(MessageType),
   communityId: z.number().optional(),
-  chatType: z.number(),
+  chatType: z.number().optional(),
   replyMessageId: z.string().optional().nullable(),
   audio: z.string().optional().nullable(),
   audioDurationMs: z.number().optional().nullable(),
